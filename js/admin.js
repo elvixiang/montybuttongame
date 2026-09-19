@@ -54,8 +54,12 @@ MCC.Admin = (function () {
       '<h3>Players (event: ' + esc(c.EVENT_ID) + ')</h3><div class="stats-row" id="adm-kpis"><div class="kpi">Loading…</div></div>' +
       '<h3>Physical button</h3><div class="row">Current key: <span class="keycap" id="adm-key">' + esc(MCC.Input.describeKey(c.BUTTON_KEY)) + '</span>' +
       '<button class="primary" id="adm-learn">Learn button</button>' +
-      '<label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="adm-touch" ' + (c.ALLOW_SCREEN_TAPS ? "checked" : "") + '> Screen touches also count as taps</label></div>' +
+      '<label style="flex-direction:row;align-items:center;gap:8px">Input mode <select id="adm-mode">' +
+      [["auto", "Auto (recommended)"], ["button", "Button / keyboard only"], ["touch", "Screen tap only"], ["both", "Button + screen tap"]].map(function (o) {
+        return '<option value="' + o[0] + '"' + (c.INPUT_MODE === o[0] ? " selected" : "") + ">" + o[1] + "</option>";
+      }).join("") + '</select></label></div>' +
       '<p class="note">Press “Learn button”, then press your Bluetooth button once. The key it sends is saved.</p>' +
+      '<div class="row"><span class="note" id="adm-inmode"></span><button id="adm-reseen">Reset button detection</button></div>' +
       '<h3>Game settings</h3><div class="grid">' + fields + '</div>' +
       '<p class="note" id="adm-diff">Taps needed to complete the cup: <b>' + tapsToWin + '</b> → ' + (tapsToWin / c.GAME_DURATION).toFixed(1) + ' taps/second to win.</p>' +
       '<div class="row" style="margin-top:10px"><button class="primary" id="adm-save">Save settings</button><button id="adm-defaults">Reset settings to defaults</button></div>' +
@@ -82,9 +86,18 @@ MCC.Admin = (function () {
         MCC.saveConfigOverrides({ BUTTON_KEY: key });
         $("#adm-key").textContent = MCC.Input.describeKey(key) + (k.code ? "  (" + k.code + ")" : "");
         msg("Button saved: " + MCC.Input.describeKey(key));
+        paintMode();
       });
     };
-    $("#adm-touch").onchange = function (e) { MCC.saveConfigOverrides({ ALLOW_SCREEN_TAPS: e.target.checked }); msg("Saved"); };
+    var paintMode = function () {
+      var I = MCC.Input;
+      $("#adm-inmode").textContent = "This device: " + (I.isTouchDevice() ? "touch screen" : "no touch screen") +
+        " · Bluetooth button seen: " + (I.buttonSeen() ? "yes" : "no") +
+        " → screen taps are " + (I.touchAllowed() ? "ON" : "OFF") + ".";
+    };
+    paintMode();
+    $("#adm-mode").onchange = function (e) { MCC.saveConfigOverrides({ INPUT_MODE: e.target.value }); paintMode(); msg("Saved"); if (api.onConfigChanged) api.onConfigChanged(); };
+    $("#adm-reseen").onclick = function () { MCC.Input.resetButtonSeen(); paintMode(); msg("Detection reset — screen taps work again until the button is pressed."); };
     $("#adm-save").onclick = function () {
       var patch = {};
       box.querySelectorAll("[data-k]").forEach(function (i) {

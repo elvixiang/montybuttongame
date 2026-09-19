@@ -3,7 +3,7 @@
   "short_name": "MONTY Cup",
   "start_url": "./",
   "display": "fullscreen",
-  "orientation": "landscape",
+  "orientation": "any",
   "background_color": "#F8AD35",
   "theme_color": "#E94E1E",
   "icons": [

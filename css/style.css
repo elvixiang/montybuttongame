@@ -166,7 +166,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .monty-game.cheer { animation: hop .7s ease-in-out infinite; }
 
 .countdown { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; pointer-events: none; background: rgba(233, 78, 30, .18); }
-.countdown.show { display: flex; }
+.countdown.show { display: flex; flex-direction: column; gap: 2rem; }
 .countdown span { font-size: 30rem; font-weight: 700; line-height: 1; --o: 1.1rem; }
 .countdown span.go { color: var(--orange); font-size: 26rem; }
 .countdown span.anim { animation: count .8s var(--ease-pop) both; }
@@ -285,6 +285,108 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .admin .pin { text-align: center; }
 .admin .pin input { font-size: 30px; width: 200px; text-align: center; letter-spacing: .3em; margin: 14px auto; }
 .admin .keycap { display: inline-block; padding: 4px 12px; border-radius: 8px; background: #2a1a10; color: #fff; font-weight: 700; }
+
+
+/* ---------------- Touch input ---------------- */
+#screen-game { touch-action: none; }
+.countdown-sub { font-size: 3.4rem; font-weight: 700; color: #fff; text-align: center; padding: 0 3rem; text-shadow: 0 .4rem 0 rgba(107, 42, 13, .4); }
+.touch-input .btn-hint { display: none; }
+#screen-game.locked .panel { pointer-events: none; }
+.ripple {
+  position: fixed; width: 14rem; height: 14rem; margin: -7rem 0 0 -7rem; border-radius: 50%; pointer-events: none; z-index: 15;
+  border: .8rem solid rgba(255, 255, 255, .9); animation: ripple .38s ease-out forwards;
+}
+@keyframes ripple { from { transform: scale(.25); opacity: 1; } to { transform: scale(1); opacity: 0; } }
+
+/* ==========================================================================
+   PORTRAIT — phones & tablets held upright.
+   Design space is 80rem wide × 128rem tall (1rem = 10px on an 800×1280 tablet).
+   Taller phones just give the cup more room.
+   ========================================================================== */
+@media (orientation: portrait) {
+  html { font-size: min(1.25vw, 0.78125vh); }
+  @supports (height: 1dvh) { html { font-size: min(1.25vw, 0.78125dvh); } }
+
+  .screen { padding: max(3rem, env(safe-area-inset-top)) max(3rem, env(safe-area-inset-right)) max(3rem, env(safe-area-inset-bottom)) max(3rem, env(safe-area-inset-left)); }
+  .mute { width: 7rem; height: 7rem; line-height: 7rem; top: auto; right: auto; left: 1.6rem; bottom: max(1.6rem, env(safe-area-inset-bottom)); }
+  body[data-screen="board"] .mute { display: none; }
+
+  /* ---- attract ---- */
+  #screen-attract { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto minmax(0, 1fr) auto auto; row-gap: 1.6rem; justify-items: center; text-align: center; }
+  .attract-copy { display: contents; }
+  .logo { grid-row: 1; width: 20rem; }
+  .title { grid-row: 2; align-items: center; }
+  .title .t1 { font-size: 14rem; }
+  .title .t2 { font-size: 7.6rem; }
+  .tagline { grid-row: 3; font-size: 3.6rem; }
+  .rules { grid-row: 4; justify-content: center; font-size: 3rem; }
+  .attract-hero { grid-row: 5; width: 100%; height: 100%; min-height: 0; }
+  .hero-glow { width: 60rem; height: 60rem; }
+  .goal { height: 100%; max-height: 64rem; width: auto; }
+  .monty-attract { width: 22rem; left: 2rem; bottom: 0; }
+  .goal-tag { right: 2rem; top: 3rem; }
+  .cta { grid-row: 6; margin-top: 0; justify-content: center; gap: 2rem; }
+  .cta-text { font-size: 7.4rem; }
+  .champs { grid-row: 7; flex-wrap: wrap; gap: 1rem; min-height: 5rem; }
+  .champs .lead { width: 100%; font-size: 2.6rem; }
+
+  /* ---- game ---- */
+  #screen-game {
+    grid-template-columns: 1fr 1fr; column-gap: 2.4rem; row-gap: 2.4rem;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas: "time taps" "stage stage" "cup cup";
+  }
+  #screen-game .hud { display: contents; }
+  .timer-card { grid-area: time; }
+  .taps-card { grid-area: taps; }
+  .timer-card, .taps-card { width: auto; padding: 1.4rem 2rem 1.6rem; }
+  .big-num { font-size: 13rem; }
+  .taps-card { display: flex; flex-direction: column; justify-content: center; }
+  .stage-card { grid-area: stage; width: auto; padding: 1.8rem 2.6rem 2.2rem; display: grid; grid-template-columns: auto 1fr; column-gap: 1.6rem; align-items: center; }
+  .stage-name { margin: 0; min-height: 0; font-size: 4rem; white-space: nowrap; }
+  .tracker { grid-column: 1 / -1; flex-direction: row; gap: 2rem; margin-top: 1.6rem; }
+  .tracker li { flex: 1; }
+  .tracker span { font-size: 2.2rem; }
+  .cup-stage { grid-area: cup; }
+  .cup-glow { width: 70rem; height: 70rem; margin: -35rem 0 0 -35rem; }
+  .monty-game { position: absolute; right: 2rem; bottom: 3rem; width: 17rem; z-index: 2; }
+  .banner { top: 44%; font-size: 5.4rem; }
+  .countdown span { font-size: 34rem; }
+  .countdown span.go { font-size: 28rem; }
+  .countdown-sub { font-size: 3.6rem; }
+
+  /* results: the panel sits at the top (clear of the phone keyboard), the cup below */
+  #screen-game.results { grid-template-rows: auto minmax(0, 1fr); grid-template-areas: "panel panel" "cup cup"; }
+  #screen-game.results .card,
+  #screen-game.results .monty-game { display: none; }
+  #screen-game.results .cup-stage { transform: none; }
+  .panel {
+    grid-area: panel; position: relative; right: auto; top: auto; width: auto;
+    transform: none; visibility: visible; display: none; padding: 3.2rem 3.6rem 3rem; gap: 1.8rem;
+  }
+  .panel.show { display: flex; transform: none; animation: paneldown .55s var(--ease-pop) both; }
+  @keyframes paneldown { from { transform: translateY(-120%); } to { transform: none; } }
+  .panel-title { font-size: 7rem; }
+  .btn { font-size: 3.6rem; }
+
+  /* ---- leaderboard ---- */
+  #screen-board { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; row-gap: 2.4rem; align-items: stretch; }
+  .board-main { gap: 1.6rem; justify-content: flex-start; min-height: 0; }
+  .board-head { justify-content: center; }
+  .board-logo { width: 11rem; }
+  .board-title { font-size: 7.6rem; }
+  .board-list { grid-template-columns: 1fr; grid-auto-flow: row; grid-template-rows: none; gap: .9rem; }
+  .board-list li { padding: .7rem 2rem .8rem 1.2rem; border-radius: 1.8rem; }
+  .board-list .rk { font-size: 3rem; }
+  .board-list .nm, .board-list .tm { font-size: 3rem; }
+  .board-side { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem 2rem; align-items: center; }
+  .you-card { grid-row: 1 / 3; padding: 2.2rem 2.4rem; }
+  .you-rank { font-size: 10rem; }
+  .you-big { font-size: 5rem; }
+  .board-actions { flex-direction: column; align-items: stretch; }
+  .board-actions .btn { width: 100%; }
+  .board-side .hint, .board-side .sync { grid-column: 1 / -1; text-align: center; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .rays, .floaty, .logo, .goal, .monty-attract, .cta-text, .bb-cap { animation: none !important; }

@@ -2,7 +2,7 @@
 
 Bazaar tap game for MONTY&Co. Press the Bluetooth button to build a Lemon Crush — ice → 3 limes → liquid — before 30 seconds run out. Fastest completion time wins.
 
-Plain HTML/CSS/JS. No framework, no build step, no app install. Built for a tablet in landscape (1280×800), scales to other sizes.
+Plain HTML/CSS/JS. No framework, no build step, no app install. Works on laptop, tablet and phone, in portrait or landscape — the layout follows the screen.
 
 ---
 
@@ -40,7 +40,20 @@ Open `http://localhost:8080`. Press **SPACE** to play.
 
 ---
 
-## 3. Change the Bluetooth button key
+## 3. How players tap (automatic)
+
+| Device | How to play |
+|---|---|
+| Laptop | SPACE key (or the Bluetooth button) |
+| Phone / tablet | Tap anywhere on the screen |
+| Tablet + Bluetooth button | Press the button **once** → from then on that tablet uses the button only; screen taps stop counting (remembered, even after reload) |
+
+The on-screen text follows automatically ("TAP TO PLAY" vs "PRESS TO PLAY").
+
+To force a mode: Admin → **Input mode** (Auto / Button only / Screen tap only / Button + screen tap), or `INPUT_MODE` in `js/config.js`.
+Button stopped working and you want to play by touch again? Admin → **Reset button detection**.
+
+### Change the Bluetooth button key
 
 The game listens for the key your button sends (default: SPACE).
 
@@ -57,11 +70,9 @@ BUTTON_KEY: " ",        // spacebar
 
 Both `KeyboardEvent.key` and `.code` values work. Not sure what your button sends? Use **Learn button** — it shows the key name.
 
-Other input settings:
-- `MIN_TAP_INTERVAL_MS: 30` — ignores double-fires from a bouncy switch. Raise to 50–60 if one press ever counts twice.
-- `ALLOW_SCREEN_TAPS: false` — set `true` to also count screen touches (testing only).
+`MIN_TAP_INTERVAL_MS: 30` ignores double-fires from a bouncy switch or two fingers landing together. Raise to 50–60 if one press ever counts twice.
 
-Holding the button counts as **one** tap. Presses only count between GO! and the end of the round.
+Holding the button counts as **one** tap. Presses only count between GO! and the end of the round. Result buttons ignore taps for ~1.5 s after a round ends, so frantic tapping can't skip the result.
 
 ---
 
@@ -161,8 +172,8 @@ Every push to `main` redeploys automatically. `/admin` works thanks to `vercel.j
 
 **Setup**
 - [ ] Pair the Bluetooth button with the tablet (Settings → Bluetooth). It appears as a keyboard.
-- [ ] Open the Vercel URL in Chrome. Menu → **Add to Home screen** → launch from the icon (opens fullscreen, landscape).
-- [ ] Admin → **Learn button** → press the button once.
+- [ ] Open the Vercel URL in Chrome. Menu → **Add to Home screen** → launch from the icon (opens fullscreen). Portrait or landscape both work — lock the tablet's rotation to the one you want.
+- [ ] Admin → **Learn button** → press the button once (this also switches the tablet to button-only).
 - [ ] Admin → set difficulty, `EVENT_ID` for the day, test Sheets connection.
 - [ ] Play 2–3 test rounds. Then Admin → **Reset leaderboard** (or use a new Event ID).
 - [ ] Tablet: disable auto-lock / screen timeout, turn on Do Not Disturb, brightness high, plug in charger. (The game also requests a screen wake lock.)

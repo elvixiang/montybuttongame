@@ -30,7 +30,7 @@
       <p class="rules"><span>30 seconds.</span> <span>Tap fast.</span> <span>Fill the cup.</span></p>
       <div class="cta" id="cta">
         <div class="bigbutton" aria-hidden="true"><div class="bb-base"></div><div class="bb-cap"></div></div>
-        <div class="cta-text outline">PRESS TO PLAY</div>
+        <div class="cta-text outline" id="cta-text">PRESS TO PLAY</div>
       </div>
     </div>
     <div class="attract-hero">
@@ -74,7 +74,7 @@
       <img class="monty monty-game" id="monty-game" src="assets/monty.webp" alt="Monty">
     </aside>
 
-    <div class="countdown" id="countdown" aria-live="assertive"><span id="countdown-num"></span></div>
+    <div class="countdown" id="countdown" aria-live="assertive"><span id="countdown-num"></span><div class="countdown-sub" id="countdown-sub">PRESS THE BUTTON AS FAST AS YOU CAN!</div></div>
     <div class="banner outline" id="banner"></div>
     <div class="test-badge" id="test-badge">TEST ROUND · NOT SAVED</div>
 
@@ -94,7 +94,7 @@
         <button class="btn btn-primary" id="btn-submit">SUBMIT SCORE</button>
         <button class="btn btn-ghost" id="btn-skip">Skip</button>
       </div>
-      <div class="hint">or press the button to save as <b id="default-name">MONTY FAN</b></div>
+      <div class="hint btn-hint">or press the button to save as <b id="default-name">MONTY FAN</b></div>
     </div>
 
     <!-- FAIL -->
@@ -113,7 +113,7 @@
         <button class="btn btn-primary" id="btn-retry">TRY AGAIN</button>
         <button class="btn btn-secondary" id="btn-board-fail">VIEW LEADERBOARD</button>
       </div>
-      <div class="hint">or press the button to try again</div>
+      <div class="hint btn-hint">or press the button to try again</div>
     </div>
   </section>
 
@@ -132,7 +132,7 @@
         <button class="btn btn-primary btn-xl" id="btn-again">PLAY AGAIN</button>
         <button class="btn btn-secondary" id="btn-home">HOME</button>
       </div>
-      <div class="hint">or press the button to play</div>
+      <div class="hint btn-hint">or press the button to play</div>
       <div class="sync" id="sync-status"></div>
     </div>
   </section>

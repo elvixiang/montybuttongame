@@ -39,7 +39,7 @@
       confetti = new MCC.Confetti($("confetti"));
       cup = new MCC.CupRenderer($("cup-canvas"), img);
       engine = new MCC.GameEngine(hooks);
-      MCC.Input.init(onPress);
+      MCC.Input.init(onPress, applyInputMode);
       MCC.Admin.init({
         onTestRound: function () { startRound({ test: true }); },
         onDemo: function (rate) { startRound({ test: true, demo: rate }); },
@@ -74,14 +74,24 @@
   function show(name) {
     ["attract", "game", "board"].forEach(function (n) { $("screen-" + n).classList.toggle("active", n === name); });
     S.screen = name;
+    document.body.setAttribute("data-screen", name);
     if (name === "game") cup.resize();
   }
 
   function clearTimers() { Object.keys(S.timers).forEach(function (k) { clearTimeout(S.timers[k]); }); S.timers = {}; }
   function later(name, ms, fn) { clearTimeout(S.timers[name]); S.timers[name] = setTimeout(fn, ms); }
 
+  // screen-tap vs button wording
+  function applyInputMode() {
+    var touch = MCC.Input.touchAllowed();
+    document.body.classList.toggle("touch-input", touch);
+    $("cta-text").textContent = touch ? "TAP TO PLAY" : "PRESS TO PLAY";
+    $("countdown-sub").textContent = touch ? "TAP THE SCREEN AS FAST AS YOU CAN!" : "PRESS THE BUTTON AS FAST AS YOU CAN!";
+  }
+
   function goAttract() {
     clearTimers();
+    applyInputMode();
     S.panel = null; S.demo = 0;
     confetti.clear();
     show("attract");
@@ -109,9 +119,10 @@
     S.test = !!opts.test; S.demo = opts.demo || 0; S.demoAcc = 0;
     S.result = null; S.entry = null; S.panel = null; S.lastSecond = null; S.warned5 = false;
     MCC.loadConfig();
+    applyInputMode();
 
     var g = $("screen-game");
-    g.classList.remove("results");
+    g.classList.remove("results", "locked");
     g.classList.toggle("testing", S.test);
     $("panel-win").classList.remove("show");
     $("panel-fail").classList.remove("show");
@@ -196,6 +207,14 @@
     b.classList.remove("show"); void b.offsetWidth; b.classList.add("show");
   }
 
+  function ripple(x, y) {
+    var r = document.createElement("span");
+    r.className = "ripple";
+    r.style.left = x + "px"; r.style.top = y + "px";
+    r.addEventListener("animationend", function () { r.remove(); });
+    $("screen-game").appendChild(r);
+  }
+
   function bounceMonty() {
     var m = $("monty-game");
     if (m.animate) m.animate([{ transform: "scale(1.1,.88)" }, { transform: "translateY(-1.2rem) scale(.97,1.04)" }, { transform: "none" }], { duration: 200, easing: "ease-out" });
@@ -216,6 +235,7 @@
     $("win-taps").textContent = res.taps;
     S.guardUntil = now + 1500 + cfg().RESULT_INPUT_GUARD_MS;
     later("panel", 1500, function () {
+      lockPanels();
       $("screen-game").classList.add("results");
       $("panel-win").classList.add("show");
       S.panel = "win";
@@ -242,12 +262,19 @@
     }
     S.guardUntil = now + 900 + cfg().RESULT_INPUT_GUARD_MS;
     later("panel", 900, function () {
+      lockPanels();
       $("screen-game").classList.add("results");
       $("panel-fail").classList.add("show");
       $("fail-bar").style.width = pct + "%";
       S.panel = "fail";
     });
     later("idle", 900 + cfg().IDLE_RETURN_MS, goAttract);
+  }
+
+  function lockPanels() {
+    var g = $("screen-game");
+    g.classList.add("locked");
+    later("unlock", cfg().RESULT_INPUT_GUARD_MS, function () { g.classList.remove("locked"); });
   }
 
   function submitName(auto) {
@@ -337,17 +364,23 @@
   function wireUI() {
     $("screen-attract").addEventListener("pointerdown", function () { MCC.Sound.unlock(); keepAwake(); if (!MCC.Admin.isOpen()) startRound(); });
     $("screen-game").addEventListener("pointerdown", function (e) {
-      if (cfg().ALLOW_SCREEN_TAPS && engine.state === "playing" && !e.target.closest(".panel")) engine.press(performance.now());
+      if (engine.state !== "playing" || e.target.closest(".panel")) return;
+      if (!MCC.Input.touchAllowed()) return;
+      e.preventDefault();
+      if (MCC.Input.touch(performance.now())) ripple(e.clientX, e.clientY);
     });
-    $("btn-submit").onclick = function () { submitName(false); };
-    $("btn-skip").onclick = function () { submitName(true); };
+    document.addEventListener("contextmenu", function (e) { if (!e.target.closest(".admin")) e.preventDefault(); });
+    // result buttons ignore frantic taps that land right after the round ends
+    var guarded = function (fn) { return function () { if (performance.now() >= S.guardUntil) fn(); }; };
+    $("btn-submit").onclick = guarded(function () { submitName(false); });
+    $("btn-skip").onclick = guarded(function () { submitName(true); });
     $("name-input").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); submitName(false); } });
     $("name-input").addEventListener("input", function (e) {
       later("name", cfg().NAME_TIMEOUT_MS, function () { if (S.panel === "win") submitName(false); });
     });
-    $("btn-retry").onclick = function () { startRound(); };
-    $("btn-board-fail").onclick = function () { goBoard(S.entry); };
-    $("btn-again").onclick = function () { startRound(); };
+    $("btn-retry").onclick = guarded(function () { startRound(); });
+    $("btn-board-fail").onclick = guarded(function () { goBoard(S.entry); });
+    $("btn-again").onclick = guarded(function () { startRound(); });
     $("btn-home").onclick = goAttract;
 
     var mute = $("mute");

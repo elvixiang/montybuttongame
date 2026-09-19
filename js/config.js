@@ -19,7 +19,13 @@ MCC.DEFAULT_CONFIG = {
   // Examples: " " or "Space" (spacebar), "Enter", "ArrowRight", "PageDown", "KeyB"
   BUTTON_KEY: " ",
   MIN_TAP_INTERVAL_MS: 30,    // ignores switch "bounce" double-fires faster than this
-  ALLOW_SCREEN_TAPS: false,   // true = touching the screen also counts as a tap (testing)
+  // How players tap:
+  //   "auto"   → laptop: keyboard/button only. Phone/tablet: tap the screen,
+  //              until a Bluetooth button is pressed once — then button only.
+  //   "button" → keyboard/Bluetooth button only
+  //   "touch"  → screen taps only
+  //   "both"   → button AND screen taps
+  INPUT_MODE: "auto",
 
   // ---- Flow ----------------------------------------------------------------
   COUNTDOWN_STEP_MS: 850,     // speed of 3 / 2 / 1 / GO!
@@ -32,7 +38,7 @@ MCC.DEFAULT_CONFIG = {
   // ---- Leaderboard ---------------------------------------------------------
   LEADERBOARD_SIZE: 10,
   EVENT_ID: "BAZAAR-2026",    // separates leaderboards per event/day. Change to start fresh.
-  SHEETS_URL: "https://script.google.com/macros/s/AKfycbynru1o1iKOe6H417OnDEFXqst1y_g4_XuPp7bETZ3QtqiD9f4LTgTg0k8sau5adDB3Ug/exec",             // Google Apps Script Web App URL ("/exec"). Empty = this tablet only.
+  SHEETS_URL: "",             // Google Apps Script Web App URL ("/exec"). Empty = this tablet only.
 
   // ---- Admin ---------------------------------------------------------------
   ADMIN_PIN: "2525",
@@ -62,6 +68,7 @@ MCC.DEFAULT_CONFIG = {
     c.MAX_LIME_SLICES = Math.min(4, Math.max(0, Math.round(Number(c.MAX_LIME_SLICES))));
     if (isNaN(c.MAX_LIME_SLICES)) c.MAX_LIME_SLICES = 3;
     c.LIQUID_TAPS_REQUIRED = Math.max(1, Math.round(Number(c.LIQUID_TAPS_REQUIRED) || 100));
+    if (["auto", "button", "touch", "both"].indexOf(c.INPUT_MODE) < 0) c.INPUT_MODE = "auto";
     MCC.config = c;
     return c;
   };
