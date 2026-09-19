@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
+<meta name="theme-color" content="#E94E1E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>MONTY Cup Challenge · MONTY&amp;Co.</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preload" href="fonts/fredoka-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app" class="loading">
+  <div class="bg" aria-hidden="true">
+    <div class="rays"></div>
+    <div class="floaties" id="floaties"></div>
+  </div>
+
+  <!-- ============ SCREEN 1 · ATTRACT ============ -->
+  <section class="screen" id="screen-attract" aria-label="Start">
+    <div class="attract-copy">
+      <img class="logo" src="assets/logo.webp" alt="MONTY&amp;Co.">
+      <h1 class="title outline"><span class="t1">MONTY</span><span class="t2">CUP CHALLENGE</span></h1>
+      <p class="tagline">MAKE YOUR PERFECT LEMON CRUSH!</p>
+      <p class="rules"><span>30 seconds.</span> <span>Tap fast.</span> <span>Fill the cup.</span></p>
+      <div class="cta" id="cta">
+        <div class="bigbutton" aria-hidden="true"><div class="bb-base"></div><div class="bb-cap"></div></div>
+        <div class="cta-text outline">PRESS TO PLAY</div>
+      </div>
+    </div>
+    <div class="attract-hero">
+      <div class="hero-glow"></div>
+      <img class="goal" src="assets/lemoncrush.webp" alt="MONTY&amp;Co. Lemon Crush">
+      <img class="monty monty-attract" src="assets/monty.webp" alt="Monty">
+      <div class="goal-tag">Make this in 30 seconds</div>
+    </div>
+    <div class="champs" id="attract-champs"></div>
+  </section>
+
+  <!-- ============ SCREEN 2 + 3 · COUNTDOWN / GAME ============ -->
+  <section class="screen" id="screen-game" aria-label="Game">
+    <aside class="hud hud-left">
+      <div class="card timer-card" id="timer-card">
+        <div class="card-label">TIME</div>
+        <div class="big-num" id="time">30.0</div>
+        <div class="unit">SEC</div>
+      </div>
+      <div class="card stage-card" id="stage-card">
+        <div class="stage-no" id="stage-no">STAGE 1</div>
+        <div class="stage-name" id="stage-name">FILLING ICE</div>
+        <ol class="tracker">
+          <li id="trk-1"><img src="assets/pile.webp" alt=""><span>Ice</span><i><b id="bar-1"></b></i></li>
+          <li id="trk-2"><img src="assets/lime.webp" alt=""><span>Lime</span><i><b id="bar-2"></b></i></li>
+          <li id="trk-3"><img src="assets/lemoncrush.webp" alt=""><span>Lemon Crush</span><i><b id="bar-3"></b></i></li>
+        </ol>
+      </div>
+    </aside>
+
+    <div class="cup-stage" id="cup-stage">
+      <div class="cup-glow"></div>
+      <canvas id="cup-canvas"></canvas>
+    </div>
+
+    <aside class="hud hud-right">
+      <div class="card taps-card">
+        <div class="card-label">TAPS</div>
+        <div class="big-num" id="taps">0</div>
+      </div>
+      <img class="monty monty-game" id="monty-game" src="assets/monty.webp" alt="Monty">
+    </aside>
+
+    <div class="countdown" id="countdown" aria-live="assertive"><span id="countdown-num"></span></div>
+    <div class="banner outline" id="banner"></div>
+    <div class="test-badge" id="test-badge">TEST ROUND · NOT SAVED</div>
+
+    <!-- WIN -->
+    <div class="panel" id="panel-win" role="dialog" aria-label="Cup complete">
+      <div class="panel-head">
+        <div class="panel-title outline">🎉 CUP COMPLETE!</div>
+        <div class="panel-sub">YOU DID IT!</div>
+      </div>
+      <div class="stats">
+        <div class="stat stat-hero"><div class="stat-label">FINAL TIME</div><div class="stat-val"><span id="win-time">0.00</span><small> SEC</small></div></div>
+        <div class="stat"><div class="stat-label">TOTAL TAPS</div><div class="stat-val" id="win-taps">0</div></div>
+      </div>
+      <label class="name-label" for="name-input">ENTER YOUR NAME</label>
+      <input id="name-input" class="name-input" type="text" maxlength="12" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done" placeholder="MONTY FAN">
+      <div class="panel-actions">
+        <button class="btn btn-primary" id="btn-submit">SUBMIT SCORE</button>
+        <button class="btn btn-ghost" id="btn-skip">Skip</button>
+      </div>
+      <div class="hint">or press the button to save as <b id="default-name">MONTY FAN</b></div>
+    </div>
+
+    <!-- FAIL -->
+    <div class="panel" id="panel-fail" role="dialog" aria-label="Time's up">
+      <div class="panel-head">
+        <div class="panel-title outline">⏰ TIME'S UP!</div>
+        <div class="panel-sub">Your cup wasn't finished.</div>
+      </div>
+      <div class="stats">
+        <div class="stat stat-hero"><div class="stat-label">FINAL TAPS</div><div class="stat-val" id="fail-taps">0</div></div>
+        <div class="stat"><div class="stat-label">TIME</div><div class="stat-val"><span id="fail-time">30.0</span><small> SEC</small></div></div>
+      </div>
+      <div class="cup-meter"><div class="cup-meter-label">CUP FILLED <b id="fail-pct">0%</b></div><i><b id="fail-bar"></b></i></div>
+      <div class="status-pill">NOT COMPLETED</div>
+      <div class="panel-actions">
+        <button class="btn btn-primary" id="btn-retry">TRY AGAIN</button>
+        <button class="btn btn-secondary" id="btn-board-fail">VIEW LEADERBOARD</button>
+      </div>
+      <div class="hint">or press the button to try again</div>
+    </div>
+  </section>
+
+  <!-- ============ LEADERBOARD ============ -->
+  <section class="screen" id="screen-board" aria-label="Leaderboard">
+    <div class="board-main">
+      <div class="board-head">
+        <img class="board-logo" src="assets/logo.webp" alt="MONTY&amp;Co.">
+        <h2 class="board-title outline">MONTY CHAMPIONS</h2>
+      </div>
+      <ol class="board-list" id="board-list"></ol>
+    </div>
+    <div class="board-side">
+      <div class="card you-card" id="you-card"></div>
+      <div class="board-actions">
+        <button class="btn btn-primary btn-xl" id="btn-again">PLAY AGAIN</button>
+        <button class="btn btn-secondary" id="btn-home">HOME</button>
+      </div>
+      <div class="hint">or press the button to play</div>
+      <div class="sync" id="sync-status"></div>
+    </div>
+  </section>
+</div>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+<button class="mute" id="mute" aria-label="Sound on / off"></button>
+<div id="admin-hotspot" aria-hidden="true"></div>
+<div id="admin-root"></div>
+<div id="boot" class="boot"><img src="assets/monty.webp" alt=""><div>Loading…</div></div>
+
+<script src="js/config.js"></script>
+<script src="js/progression.js"></script>
+<script src="js/game.js"></script>
+<script src="js/input.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/leaderboard.js"></script>
+<script src="js/cup-renderer.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
