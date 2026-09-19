@@ -38,7 +38,7 @@ MCC.DEFAULT_CONFIG = {
   // ---- Leaderboard ---------------------------------------------------------
   LEADERBOARD_SIZE: 10,
   EVENT_ID: "BAZAAR-2026",    // separates leaderboards per event/day. Change to start fresh.
-  SHEETS_URL: "",             // Google Apps Script Web App URL ("/exec"). Empty = this tablet only.
+  SHEETS_URL: "https://script.google.com/macros/s/AKfycbynru1o1iKOe6H417OnDEFXqst1y_g4_XuPp7bETZ3QtqiD9f4LTgTg0k8sau5adDB3Ug/exec",             // Google Apps Script Web App URL ("/exec"). Empty = this tablet only.
 
   // ---- Admin ---------------------------------------------------------------
   ADMIN_PIN: "2525",
