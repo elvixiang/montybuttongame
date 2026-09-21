@@ -15,9 +15,10 @@ MCC.DEFAULT_CONFIG = {
   LIQUID_TAPS_REQUIRED: 100,  // taps to fill the cup with Lemon Crush (stage 3)
 
   // ---- Physical button -----------------------------------------------------
-  // The key your Bluetooth button sends. Matches KeyboardEvent.key OR .code.
-  // Examples: " " or "Space" (spacebar), "Enter", "ArrowRight", "PageDown", "KeyB"
-  BUTTON_KEY: " ",
+  // "ANY" = every key / button press counts as a tap (incl. copy / paste / cut
+  // buttons — a Ctrl+V combo still counts once). Or one specific key, matched
+  // by KeyboardEvent.key OR .code: " " (spacebar), "Enter", "ArrowRight", "KeyB"…
+  BUTTON_KEY: "ANY",
   MIN_TAP_INTERVAL_MS: 30,    // ignores switch "bounce" double-fires faster than this
   // How players tap:
   //   "auto"   → laptop: keyboard/button only. Phone/tablet: tap the screen,
@@ -38,7 +39,7 @@ MCC.DEFAULT_CONFIG = {
   // ---- Leaderboard ---------------------------------------------------------
   LEADERBOARD_SIZE: 10,
   EVENT_ID: "BAZAAR-2026",    // separates leaderboards per event/day. Change to start fresh.
-  SHEETS_URL: "https://script.google.com/macros/s/AKfycbynru1o1iKOe6H417OnDEFXqst1y_g4_XuPp7bETZ3QtqiD9f4LTgTg0k8sau5adDB3Ug/exec",             // Google Apps Script Web App URL ("/exec"). Empty = this tablet only.
+  SHEETS_URL: "",             // Google Apps Script Web App URL ("/exec"). Empty = this tablet only.
 
   // ---- Admin ---------------------------------------------------------------
   ADMIN_PIN: "2525",

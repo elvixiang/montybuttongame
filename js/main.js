@@ -389,7 +389,7 @@
     mute.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
     mute.onclick = function () { MCC.Sound.setMuted(!MCC.Sound.isMuted()); paintMute(); };
     window.addEventListener("keydown", function (e) {
-      if ((e.key === "m" || e.key === "M") && !/input|textarea/i.test(e.target.tagName) && !MCC.Admin.isOpen()) { MCC.Sound.setMuted(!MCC.Sound.isMuted()); paintMute(); }
+      if ((e.key === "m" || e.key === "M") && String(cfg().BUTTON_KEY).toUpperCase() !== "ANY" && !/input|textarea/i.test(e.target.tagName) && !MCC.Admin.isOpen()) { MCC.Sound.setMuted(!MCC.Sound.isMuted()); paintMute(); }
     });
     document.addEventListener("visibilitychange", function () { if (!document.hidden) keepAwake(); });
   }

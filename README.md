@@ -44,7 +44,7 @@ Open `http://localhost:8080`. Press **SPACE** to play.
 
 | Device | How to play |
 |---|---|
-| Laptop | SPACE key (or the Bluetooth button) |
+| Laptop | Any key (e.g. SPACE) or the Bluetooth button |
 | Phone / tablet | Tap anywhere on the screen |
 | Tablet + Bluetooth button | Press the button **once** → from then on that tablet uses the button only; screen taps stop counting (remembered, even after reload) |
 
@@ -53,22 +53,12 @@ The on-screen text follows automatically ("TAP TO PLAY" vs "PRESS TO PLAY").
 To force a mode: Admin → **Input mode** (Auto / Button only / Screen tap only / Button + screen tap), or `INPUT_MODE` in `js/config.js`.
 Button stopped working and you want to play by touch again? Admin → **Reset button detection**.
 
-### Change the Bluetooth button key
+### Bluetooth button: any key counts (default)
 
-The game listens for the key your button sends (default: SPACE).
+By default **every key the button sends counts as one tap** (`BUTTON_KEY: "ANY"`). No button setup needed — it works even if the button is set to copy / paste / cut, volume, arrows, etc. A combo like Ctrl+V still counts as **one** tap.
 
-**Easiest — on the tablet (no code):**
-1. Open Admin (see §6) → **Learn button**.
-2. Press the Bluetooth button once. Done — saved on that tablet.
-
-**In code (applies to every device):** edit `js/config.js`
-
-```js
-BUTTON_KEY: " ",        // spacebar
-// other examples: "Enter", "ArrowRight", "PageDown", "KeyB", "AudioVolumeUp"
-```
-
-Both `KeyboardEvent.key` and `.code` values work. Not sure what your button sends? Use **Learn button** — it shows the key name.
+Only want one specific key to count? Admin → **Learn one key** → press the button once. To go back: Admin → **Any key counts**.
+In code: `BUTTON_KEY` in `js/config.js` — `"ANY"`, or a key such as `" "` (space), `"Enter"`, `"ArrowRight"`, `"KeyB"`.
 
 `MIN_TAP_INTERVAL_MS: 30` ignores double-fires from a bouncy switch or two fingers landing together. Raise to 50–60 if one press ever counts twice.
 
@@ -173,7 +163,7 @@ Every push to `main` redeploys automatically. `/admin` works thanks to `vercel.j
 **Setup**
 - [ ] Pair the Bluetooth button with the tablet (Settings → Bluetooth). It appears as a keyboard.
 - [ ] Open the Vercel URL in Chrome. Menu → **Add to Home screen** → launch from the icon (opens fullscreen). Portrait or landscape both work — lock the tablet's rotation to the one you want.
-- [ ] Admin → **Learn button** → press the button once (this also switches the tablet to button-only).
+- [ ] Press the Bluetooth button once on the start screen (this switches the tablet to button-only). No key setup needed.
 - [ ] Admin → set difficulty, `EVENT_ID` for the day, test Sheets connection.
 - [ ] Play 2–3 test rounds. Then Admin → **Reset leaderboard** (or use a new Event ID).
 - [ ] Tablet: disable auto-lock / screen timeout, turn on Do Not Disturb, brightness high, plug in charger. (The game also requests a screen wake lock.)

@@ -53,12 +53,12 @@ MCC.Admin = (function () {
       '<div class="row" style="justify-content:space-between"><h2>MONTY Cup Challenge · Admin</h2><button id="adm-x">Close ✕</button></div>' +
       '<h3>Players (event: ' + esc(c.EVENT_ID) + ')</h3><div class="stats-row" id="adm-kpis"><div class="kpi">Loading…</div></div>' +
       '<h3>Physical button</h3><div class="row">Current key: <span class="keycap" id="adm-key">' + esc(MCC.Input.describeKey(c.BUTTON_KEY)) + '</span>' +
-      '<button class="primary" id="adm-learn">Learn button</button>' +
+      '<button class="primary" id="adm-any">Any key counts</button><button id="adm-learn">Learn one key</button>' +
       '<label style="flex-direction:row;align-items:center;gap:8px">Input mode <select id="adm-mode">' +
       [["auto", "Auto (recommended)"], ["button", "Button / keyboard only"], ["touch", "Screen tap only"], ["both", "Button + screen tap"]].map(function (o) {
         return '<option value="' + o[0] + '"' + (c.INPUT_MODE === o[0] ? " selected" : "") + ">" + o[1] + "</option>";
       }).join("") + '</select></label></div>' +
-      '<p class="note">Press “Learn button”, then press your Bluetooth button once. The key it sends is saved.</p>' +
+      '<p class="note">“Any key counts” works with any Bluetooth button (even copy / paste / cut buttons). “Learn one key”: press it, then press your button once — only that key will count.</p>' +
       '<div class="row"><span class="note" id="adm-inmode"></span><button id="adm-reseen">Reset button detection</button></div>' +
       '<h3>Game settings</h3><div class="grid">' + fields + '</div>' +
       '<p class="note" id="adm-diff">Taps needed to complete the cup: <b>' + tapsToWin + '</b> → ' + (tapsToWin / c.GAME_DURATION).toFixed(1) + ' taps/second to win.</p>' +
@@ -79,6 +79,12 @@ MCC.Admin = (function () {
     box.addEventListener("keydown", function (e) { e.stopPropagation(); });
 
     $("#adm-x").onclick = close;
+    $("#adm-any").onclick = function () {
+      MCC.Input.cancelLearn();
+      MCC.saveConfigOverrides({ BUTTON_KEY: "ANY" });
+      $("#adm-key").textContent = "ANY KEY";
+      msg("Every button / key now counts as a tap.");
+    };
     $("#adm-learn").onclick = function () {
       $("#adm-key").textContent = "press your button…";
       MCC.Input.learnNextKey(function (k) {

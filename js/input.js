@@ -4,6 +4,9 @@
      • ignores OS key-repeat (event.repeat)
      • ignores repeated keydowns while the key is still held (no keyup yet)
      • ignores switch bounce / double touches faster than MIN_TAP_INTERVAL_MS
+   BUTTON_KEY "ANY": every key counts. A combo like Ctrl+V (what many cheap
+   Bluetooth buttons send for copy / paste / cut) is still ONE tap: only the
+   first key of a press counts while the others are held with it.
    INPUT_MODE "auto": a touch device uses screen taps until a Bluetooth button
    is pressed once; from then on that device uses the button only (remembered).
    ========================================================================== */
@@ -18,10 +21,15 @@ MCC.Input = (function () {
   var HELD_FAILSAFE_MS = 1500; // some buttons lose a keyup; after this a new press is accepted
   var SEEN_KEY = "mcc.buttonSeen";
 
-  function keyId(e) { return e.code || e.key; }
+  var lastKeyTime = 0;
+
+  function keyId(e) { return e.code || e.key || "?"; }
+  function anyKey() { return String(MCC.config.BUTTON_KEY).toUpperCase() === "ANY"; }
+  function adminOpen() { return MCC.Admin && MCC.Admin.isOpen && MCC.Admin.isOpen(); }
 
   function matches(e) {
     var k = MCC.config.BUTTON_KEY;
+    if (anyKey()) return true;
     if (k === " " || k === "Space" || k === "Spacebar") {
       return e.key === " " || e.code === "Space" || e.key === "Spacebar";
     }
@@ -69,18 +77,23 @@ MCC.Input = (function () {
       cb({ key: e.key, code: e.code });
       return;
     }
+    if (adminOpen()) return;
     if (!matches(e)) return;
-    // Let people type spaces in the name box
-    if (isTyping(e) && (e.key === " " || e.key.length === 1)) return;
+    if (anyKey()) { if (isTyping(e)) return; }            // typing a name: keys type normally
+    else if (isTyping(e) && (e.key === " " || e.key.length === 1)) return; // let people type spaces
 
-    e.preventDefault(); // stop page scroll / button activation
+    e.preventDefault(); // stop page scroll / copy / paste / button activation
     if (!buttonAllowed()) return;
+    var now = performance.now();
+    lastKeyTime = now;
     if (e.repeat) return;
 
-    var now = performance.now();
     var id = keyId(e);
-    if (held[id] && now - held[id] < HELD_FAILSAFE_MS) return;
+    Object.keys(held).forEach(function (k) { if (now - held[k] > HELD_FAILSAFE_MS) delete held[k]; });
+    if (held[id]) return;
+    var chord = Object.keys(held).length > 0;  // another key of the same press is still down
     held[id] = now;
+    if (chord && anyKey()) return;
 
     markButtonSeen();
     accept(now, "button");
@@ -93,6 +106,17 @@ MCC.Input = (function () {
 
   function clearHeld() { held = {}; }
 
+  // Some buttons send a real Copy / Cut / Paste command with no key event.
+  function onClipboard(e) {
+    if (!anyKey() || adminOpen() || isTyping(e)) return;
+    e.preventDefault();
+    var now = performance.now();
+    if (now - lastKeyTime < 250) return;   // already counted by its key event
+    if (!buttonAllowed()) return;
+    markButtonSeen();
+    accept(now, "button");
+  }
+
   return {
     init: function (onPress, onModeChange) {
       handler = onPress;
@@ -101,6 +125,7 @@ MCC.Input = (function () {
       window.addEventListener("keyup", onKeyUp, { capture: true });
       window.addEventListener("blur", clearHeld);
       document.addEventListener("visibilitychange", clearHeld);
+      ["copy", "cut", "paste"].forEach(function (t) { document.addEventListener(t, onClipboard, true); });
     },
     /* a screen tap; returns true if it counted */
     touch: function (now) { return touchAllowed() ? accept(now || performance.now(), "touch") : false; },
@@ -113,6 +138,7 @@ MCC.Input = (function () {
     cancelLearn: function () { learnCb = null; },
     describeKey: function (k) {
       if (k === " " || k === "Space") return "SPACE";
+      if (String(k).toUpperCase() === "ANY") return "ANY KEY";
       return String(k);
     }
   };
