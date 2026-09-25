@@ -9,10 +9,10 @@ window.MCC = window.MCC || {};
 MCC.DEFAULT_CONFIG = {
   // ---- Game difficulty -----------------------------------------------------
   GAME_DURATION: 30,          // seconds
-  ICE_TAPS_REQUIRED: 100,     // taps to fill the cup with crushed ice (stage 1)
+  ICE_TAPS_REQUIRED: 85,     // taps to fill the cup with crushed ice (stage 1)
   LIME_INTERVAL: 10,          // taps per lime slice after the ice is full (stage 2)
   MAX_LIME_SLICES: 3,         // lime slices before the liquid starts (0–4)
-  LIQUID_TAPS_REQUIRED: 100,  // taps to fill the cup with Lemon Crush (stage 3)
+  LIQUID_TAPS_REQUIRED: 85,  // taps to fill the cup with Lemon Crush (stage 3)
 
   // ---- Physical button -----------------------------------------------------
   // "ANY" = every key / button press counts as a tap (incl. copy / paste / cut
